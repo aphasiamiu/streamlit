@@ -56,7 +56,7 @@ def criteria():
     #wordcloud content
     file_content = open("sampletext.txt","r")
     mytext = file_content.read()
-    #keywordcloud(mytext)
+    keywordcloud(mytext)
 
 #random color for the word cloud
 def hsl_color_func(word, font_size, position, orientation, random_state=None,
