@@ -9,9 +9,20 @@ import jieba
 import random
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
+HTML_WRAPPER = """<div style="overflow-x: auto; background-color: #F7F7FF;
+border-radius: 0.5rem; padding: 1.5rem;line-height: 2; margin-bottom: 2rem">{}</div>"""
 
-def comments():
-    st.write('Customer feedback')
+def comments(seed_question):
+     queries = next(item for item in file if item["query"] == seed_question)
+     queries = queries['agg_results']['target_clusters'][0]['examples']
+     feedback = ""
+     for query in queries:
+         feedback+="<b>\""+query+"\"</b><br>"
+     st.write(HTML_WRAPPER.format(feedback), unsafe_allow_html=True)
+  
+def comment_by_keyword(queries):
+    keyword = ['1','2','3']
+    key_comment = st.radio('customer\'s feedback',keyword)
 def barchart(index):
     x = brands
     neg=[]
@@ -25,7 +36,7 @@ def barchart(index):
     fig = go.Figure(go.Bar(x=x, y=pos, name='Positive',marker_color = '#57A773' ))
     fig.add_trace(go.Bar(x=x, y=neu, name='Neutural',marker_color = '#FABC3C'))
     fig.add_trace(go.Bar(x = x,y = neg,name = 'Negative',marker_color = '#EE6352'))
-    fig.update_layout(barmode = 'stack')
+    fig.update_layout(barmode = 'stack',xaxis={'categoryorder':'total descending'})
     st.plotly_chart(fig)
     
 
@@ -38,7 +49,8 @@ def donut(brand,index):
     fig.update_traces(hoverinfo='label+value', textinfo='percent', textfont_size=20,
                   marker=dict(colors=colors))
     st.plotly_chart(fig)
-    
+
+   
 def criteria():
     st.subheader('Key Purchase Criteria')
     
@@ -61,14 +73,15 @@ def criteria():
 #random color for the word cloud
 def hsl_color_func(word, font_size, position, orientation, random_state=None,
                     **kwargs):
-    return "hsl(242, 86%%, %d%%)" % random.randint(74, 95)
+    return "hsl(242, 86%%, %d%%)" % random.randint(74, 86)
 
 #generate keywordcloud
 def keywordcloud(mytext):
     cut_text =" ".join(jieba.cut(mytext))
-    wordcloud = WordCloud(margin=20,font_path="ziti.otf", \
+    wordcloud = WordCloud(margin=4,font_path="ziti.otf", \
                       background_color='white',color_func=hsl_color_func).generate(cut_text)
     plt.imshow(wordcloud, interpolation='bilinear')
+    
     plt.axis("off")
     plt.show()
     st.pyplot()    
@@ -77,10 +90,11 @@ def byfilter(index):
     #Customer's feedback
     st.subheader('Customer\'s Feedback')
     barchart(index)
+    comments(seed_question[index])
     brand = st.selectbox('Please select the brand',brands)
     #display selected donut chart
     donut(brand,index)
-    comments()
+    
     
     
     
@@ -88,8 +102,10 @@ def byfilter(index):
 st.title('Sushi Restaurant Report')
 
 #purchase criteria
-content = sorted(json.load(open('bain_1.json')), key = lambda i: i['score'])
-brands = list(content[0].keys())[1:-1]
+file = json.load(open('bain_final.json'))
+content = sorted(file, key = lambda i: i['score'])
+#brands = list(content[0].keys())[1:-1]
+brands = ['万岁' ,'大禾', '禾绿', '池田', '摩打食堂', '新一番', '元气', '争鲜', '丸米', '滨寿司', '伊秀寿司']
 score= []
 seed_question = []
 for i in content[:5]:
@@ -103,8 +119,8 @@ for i in content[:5]:
 #     select_brand[brand]= st.sidebar.checkbox(brand)
 
 st.sidebar.subheader('Filter')
-filter = st.sidebar.radio('',('Overall Key Cirteria','By Key Cirteria'))
-if filter == 'Overall Key Cirteria':
+filter = st.sidebar.radio('',('Overall Key Criteria','By Key Criteria'))
+if filter == 'Overall Key Criteria':
     criteria()
 else:
     key = st.sidebar.selectbox('Please select a seed_question',
