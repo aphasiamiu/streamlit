@@ -23,7 +23,6 @@ def comments(seed_question):
          
      keyword = st.selectbox('Please select the keyword',keywords)
      comment_by_keyword(keyword, queries)
-     #st.write((samplehtml), unsafe_allow_html=True)
 def comment_by_keyword(keyword,queries):
     #keyword = ['1','2','3']
     queries = next(item for item in queries if item["name"] == keyword)
@@ -70,13 +69,13 @@ def criteria():
             orientation='h'))
     st.plotly_chart(fig)
     
-    #Word Cloud
-    st.subheader('Keyword Cloud')
-
-    #wordcloud content
-    file_content = open("sampletext.txt","r")
-    mytext = file_content.read()
-    keywordcloud(mytext)
+#     #Word Cloud
+#     st.subheader('Keyword Cloud')
+# 
+#     #wordcloud content
+#     file_content = open("sampletext.txt","r")
+#     mytext = file_content.read()
+#     #keywordcloud(mytext)
 
 #random color for the word cloud
 def hsl_color_func(word, font_size, position, orientation, random_state=None,
@@ -96,15 +95,10 @@ def keywordcloud(mytext):
  
 def byfilter(index):
     #Customer's feedback
-    st.subheader('Customer\'s Feedback')
-    filter_on = st.button('filter by brand')
-    if filter_on:
-        barchart(index)
-        brand = st.selectbox('Please select the brand',brands)
+    barchart(index)
+    #brand = st.selectbox('Please select the brand',brands)
         #display selected donut chart
-        donut(brand,index)
-    else:
-        barchart(index)
+    #donut(brand,index)
     comments(seed_question[index])
     
     
@@ -131,17 +125,19 @@ for i in content[:5]:
 # for brand in brands:
 #     select_brand[brand]= st.sidebar.checkbox(brand)
 
-st.sidebar.subheader('Filter')
-filter = st.sidebar.radio('',('Overall Key Criteria','By Key Criteria'))
-if filter == 'Overall Key Criteria':
-    criteria()
-else:
-    key = st.sidebar.selectbox('Please select a seed_question',
-    seed_question)
-    byfilter(seed_question.index(key))
+# st.sidebar.subheader('Filter')
+# filter = st.sidebar.radio('',('Overall Key Criteria','By Key Criteria'))
+# if filter == 'Overall Key Criteria':
+#     criteria()
+# else:
+#     key = st.sidebar.selectbox('Please select a seed_question',
+#     seed_question)
+#     byfilter(seed_question.index(key))
 
-
-
+criteria()
+st.subheader('Customer\'s Feedback')
+key = st.selectbox('Please select a seed_question',seed_question)
+byfilter(seed_question.index(key))
     
 
 
