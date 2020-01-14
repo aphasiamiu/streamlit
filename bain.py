@@ -9,20 +9,28 @@ import jieba
 import random
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
-HTML_WRAPPER = """<div style="overflow-x: auto; background-color: #F7F7FF;
+HTML_WRAPPER = """<div id = "comment" style="overflow-x: auto; background-color: #F7F7FF;
 border-radius: 0.5rem; padding: 1.5rem;line-height: 2; margin-bottom: 2rem">{}</div>"""
 
 def comments(seed_question):
      queries = next(item for item in file if item["query"] == seed_question)
-     queries = queries['agg_results']['target_clusters'][0]['examples']
-     feedback = ""
+     #queries = queries['agg_results']['target_clusters'][0]['examples']
+     queries = queries['agg_results']['target_clusters']
+     keywords = []
+     
      for query in queries:
-         feedback+="<b>\""+query+"\"</b><br>"
-     st.write(HTML_WRAPPER.format(feedback), unsafe_allow_html=True)
-  
-def comment_by_keyword(queries):
-    keyword = ['1','2','3']
-    key_comment = st.radio('customer\'s feedback',keyword)
+         keywords.append(query['name'])
+         
+     keyword = st.selectbox('Please select the keyword',keywords)
+     comment_by_keyword(keyword, queries)
+     #st.write((samplehtml), unsafe_allow_html=True)
+def comment_by_keyword(keyword,queries):
+    #keyword = ['1','2','3']
+    queries = next(item for item in queries if item["name"] == keyword)
+    feedback = ""
+    for query in queries['examples']:
+        feedback+="<b>\""+query+"\"</b><br>"
+    st.write(HTML_WRAPPER.format(feedback), unsafe_allow_html=True)
 def barchart(index):
     x = brands
     neg=[]
@@ -89,11 +97,16 @@ def keywordcloud(mytext):
 def byfilter(index):
     #Customer's feedback
     st.subheader('Customer\'s Feedback')
-    barchart(index)
+    filter_on = st.button('filter by brand')
+    if filter_on:
+        barchart(index)
+        brand = st.selectbox('Please select the brand',brands)
+        #display selected donut chart
+        donut(brand,index)
+    else:
+        barchart(index)
     comments(seed_question[index])
-    brand = st.selectbox('Please select the brand',brands)
-    #display selected donut chart
-    donut(brand,index)
+    
     
     
     
