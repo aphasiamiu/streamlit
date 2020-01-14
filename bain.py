@@ -19,11 +19,12 @@ def comments(seed_question):
      keywords = []
      
      for query in queries:
-         keywords.append(query['name'])
+         keywords.append(query['name']+' ('+str(query['size'])+')')
          
      keyword = st.selectbox('Please select the keyword',keywords)
      comment_by_keyword(keyword, queries)
 def comment_by_keyword(keyword,queries):
+    keyword = keyword.split(' ')[0]
     #keyword = ['1','2','3']
     queries = next(item for item in queries if item["name"] == keyword)
     feedback = ""
@@ -31,19 +32,25 @@ def comment_by_keyword(keyword,queries):
         feedback+="<b>\""+query+"\"</b><br>"
     st.write(HTML_WRAPPER.format(feedback), unsafe_allow_html=True)
 def barchart(index):
-    x = brands
     neg=[]
     pos = []
     neu = []
+    total_list = []
+
     for brand in brands:
-        neg.append(content[index][brand]['num_of_sample']['NEG'])
-        neu.append(content[index][brand]['num_of_sample']['NEU'])
-        pos.append(content[index][brand]['num_of_sample']['POS'])
-        
+        num = content[index][brand]['num_of_sample']
+        total = num['NEG']+num['NEU']+num['POS']
+        neg.append(num['NEG']/total)
+        neu.append(num['NEU']/total)
+        pos.append(num['POS']/total)
+        total_list.append(total)
+    x = [brands[i]+str(total_list[i]) for i in range(len(brands))]
+    print(zip(brands,total_list))
     fig = go.Figure(go.Bar(x=x, y=pos, name='Positive',marker_color = '#57A773' ))
+    fig.update_layout(xaxis={'categoryorder':'total descending'})
     fig.add_trace(go.Bar(x=x, y=neu, name='Neutural',marker_color = '#FABC3C'))
     fig.add_trace(go.Bar(x = x,y = neg,name = 'Negative',marker_color = '#EE6352'))
-    fig.update_layout(barmode = 'stack',xaxis={'categoryorder':'total descending'})
+    fig.update_layout(barmode = 'stack')
     st.plotly_chart(fig)
     
 
