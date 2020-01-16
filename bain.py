@@ -41,7 +41,7 @@ def embeded(seed_question):
 # new embedded function for new data structure
 def embedded(seed_question):
     st.subheader('Embedded Result')
-    embed_brand = st.selectbox('', brands)
+    embed_brand = st.selectbox('  ', brands)
     queries = next(item for item in file if item["query"] == seed_question)
     queries = queries['brands'][embed_brand]['embed_clusters']
 
@@ -132,7 +132,7 @@ def comment_by_keyword(keyword, queries):
 
 
 # sentiment barchart
-def barchart(index):
+def sentiment(index):
     st.subheader('Sentiment Result')
     neg = []
     pos = []
@@ -160,6 +160,20 @@ def barchart(index):
     st.plotly_chart(fig, config={'displayModeBar': False}, width=800, height=350)
     source = 'Source: Consumer survey(N=' + str(sample_num) + ")     Result shown in percentage"
     st.write(HTML_SOURCE.format(source), unsafe_allow_html=True)
+
+    # show example results
+    sentiment_example = st.checkbox('Show Example Results')
+    if sentiment_example:
+        senti_brand = st.selectbox('', brands)
+        sentiment_list = []
+        for i in ['NEGATIVE','POSITIVE','NEUTRAL']:
+            sentiment_list.append(i+ " ("+str(content[index]['brands'][senti_brand]['keyword_clusters']['num_of_sample'][senti_brand][i[:3]])+")")
+        chosen = st.selectbox('',sentiment_list)
+        chosen = chosen[:3]
+
+        result = content[index]['brands'][senti_brand]['keyword_clusters']['sentiments'][senti_brand]['sample'][chosen]
+        st.write(result)
+
 
 
 def donut(brand, index):
@@ -214,7 +228,7 @@ def keywordcloud(mytext):
 
 def byfilter(index):
     # Customer's feedback
-    barchart(index)
+    sentiment(index)
     st.write(" ")
     st.write(" ")
     target(seed_question[index])
