@@ -17,8 +17,7 @@ TEXT_WRAPPER = """<font color={}>{}</font> """
 text_color = ['#C33C54', '#254E70', '#F26419', '#F6AE2D',
               '#86BBD8', '#2F4858', '#B84A62', '#A997DF', '#F7996E', '#4C9F70']
 
-HTML_SOURCE = """<div style = "font-size: 12px; color: #979797; margin-bottom: 2rem; margin-left: 1rem">{}</div> """
-
+HTML_SOURCE = """<div style = "font-size: 12px; color: #D8D8D8; margin-bottom: 2rem; margin-left: 1rem">{}</div> """
 
 # original embedded function
 def embeded(seed_question):
@@ -41,7 +40,8 @@ def embeded(seed_question):
 
 # new embedded function for new data structure
 def embedded(seed_question):
-    embed_brand = st.selectbox('embedded by brand', brands)
+    st.subheader('Embedded Result')
+    embed_brand = st.selectbox('', brands)
     queries = next(item for item in file if item["query"] == seed_question)
     queries = queries['brands'][embed_brand]['embed_clusters']
 
@@ -81,6 +81,7 @@ def comments(seed_question):
 
 # show the target_cluster result
 def target(query):
+    st.subheader('Target Result')
     queries = next(item for item in file if item["query"] == query)
     factors = []
     num = []
@@ -132,6 +133,7 @@ def comment_by_keyword(keyword, queries):
 
 # sentiment barchart
 def barchart(index):
+    st.subheader('Sentiment Result')
     neg = []
     pos = []
     neu = []
@@ -179,6 +181,9 @@ def criteria():
         orientation='h'))
     fig.update_layout(margin=dict(l=0, r=0, t=20, b=10),xaxis = dict(range=[0.75,0.88]))
     st.plotly_chart(fig, config={'displayModeBar': False},width=700, height=100 + 35 * rank)
+    st.write(' ')
+    st.write(' ')
+    st.write(' ')
 
 
 #     #Word Cloud
@@ -210,7 +215,11 @@ def keywordcloud(mytext):
 def byfilter(index):
     # Customer's feedback
     barchart(index)
+    st.write(" ")
+    st.write(" ")
     target(seed_question[index])
+    st.write(" ")
+    st.write(" ")
     # comments(seed_question[index])
     embedded(seed_question[index])
 
@@ -224,7 +233,7 @@ brands = ['万岁', '大禾', '禾绿', '池田', '摩打食堂', '新一番', '
 score = []
 seed_question = []
 
-st.subheader('Key Purchase Criteria')
+st.header('Key Purchase Criteria')
 rank = st.number_input('insert a number', min_value=3, value=5)
 for i in content[-rank:]:
     score.append(i['score'])
@@ -246,6 +255,6 @@ for i in content[-rank:]:
 #     byfilter(seed_question.index(key))
 
 criteria()
-st.subheader('Customer\'s Feedback')
-key = st.selectbox('Please select a seed_question', seed_question)
+st.header('Customer\'s Feedback')
+key = st.selectbox('', seed_question)
 byfilter(seed_question.index(key))
