@@ -17,7 +17,7 @@ TEXT_WRAPPER = """<font color={}>{}</font> """
 text_color = ['#C33C54', '#254E70', '#F26419', '#F6AE2D',
               '#86BBD8', '#2F4858', '#B84A62', '#A997DF', '#F7996E', '#4C9F70']
 
-HTML_SOURCE = """<div style = "font-size: 12px; color: #979797; margin-bottom: 2rem; margin-left: 5rem">{}</div> """
+HTML_SOURCE = """<div style = "font-size: 12px; color: #979797; margin-bottom: 2rem; margin-left: 1rem">{}</div> """
 
 
 # original embedded function
@@ -84,7 +84,7 @@ def target(query):
     queries = next(item for item in file if item["query"] == query)
     factors = []
     num = []
-    examples = queries['brands']['All']['target_clusters']
+    examples = queries['brands']['万岁']['target_clusters']
     for example in examples:
         if example['name'] != "others":
             factors.append(example['name'])
@@ -107,14 +107,15 @@ def target(query):
 
         for factor in factors:
             target_list[factor][i] /= target_list['total'][i]
+
     sum(target_list['total'])
 
     x = [brands[i] + str(target_list['total'][i]) for i in range(len(brands))]
     fig = go.Figure(go.Bar(x=x, y=target_list[factors[0]], name=factors[0], marker_color='#57A773'))
     for i in factors[1:]:
         fig.add_trace(go.Bar(x=x, y=target_list[i], name=i, marker_color=text_color[factors.index(i)]))
-    fig.update_layout(barmode='stack')
-    st.plotly_chart(fig)
+    fig.update_layout(barmode='stack',margin=dict(l=0, r=0, t=20, b=10))
+    st.plotly_chart(fig, config={'displayModeBar': False}, width=800, height=350)
     source = "Source: Consumer survey(N=" + str(sum(target_list['total'])) + ")     Result shown in percentage"
     st.write(HTML_SOURCE.format(source), unsafe_allow_html=True)
 
@@ -129,6 +130,7 @@ def comment_by_keyword(keyword, queries):
     st.write(HTML_WRAPPER.format(feedback), unsafe_allow_html=True)
 
 
+# sentiment barchart
 def barchart(index):
     neg = []
     pos = []
@@ -152,8 +154,8 @@ def barchart(index):
     fig = go.Figure(go.Bar(x=x, y=pos, name='Positive', marker_color='#57A773'))
     fig.add_trace(go.Bar(x=x, y=neu, name='Neutural', marker_color='#FABC3C'))
     fig.add_trace(go.Bar(x=x, y=neg, name='Negative', marker_color='#EE6352'))
-    fig.update_layout(barmode='stack')
-    st.plotly_chart(fig)
+    fig.update_layout(barmode='stack', margin=dict(l=0, r=0, t=15, b=0))
+    st.plotly_chart(fig, config={'displayModeBar': False}, width=800, height=350)
     source = 'Source: Consumer survey(N=' + str(sample_num) + ")     Result shown in percentage"
     st.write(HTML_SOURCE.format(source), unsafe_allow_html=True)
 
@@ -175,7 +177,8 @@ def criteria():
         y=seed_question,
         marker_color='#918EF4',
         orientation='h'))
-    st.plotly_chart(fig,width = 750,height = 250+30*rank)
+    fig.update_layout(margin=dict(l=0, r=0, t=20, b=10),xaxis = dict(range=[0.75,0.88]))
+    st.plotly_chart(fig, config={'displayModeBar': False},width=700, height=100 + 35 * rank)
 
 
 #     #Word Cloud
@@ -222,7 +225,7 @@ score = []
 seed_question = []
 
 st.subheader('Key Purchase Criteria')
-rank = st.number_input('insert a number',min_value = 3,value = 5)
+rank = st.number_input('insert a number', min_value=3, value=5)
 for i in content[-rank:]:
     score.append(i['score'])
     seed_question.append(i['query'])
