@@ -170,14 +170,12 @@ def donut(brand, index):
 
 
 def criteria():
-    st.subheader('Key Purchase Criteria')
-
     fig = go.Figure(go.Bar(
         x=score,
         y=seed_question,
         marker_color='#918EF4',
         orientation='h'))
-    st.plotly_chart(fig)
+    st.plotly_chart(fig,width = 750,height = 250+30*rank)
 
 
 #     #Word Cloud
@@ -222,7 +220,9 @@ content = sorted(file, key=lambda i: i['score'])
 brands = ['万岁', '大禾', '禾绿', '池田', '摩打食堂', '新一番', '元气', '争鲜', '丸米', '滨寿司', '伊秀寿司']
 score = []
 seed_question = []
-rank = 10
+
+st.subheader('Key Purchase Criteria')
+rank = st.number_input('insert a number',min_value = 3,value = 5)
 for i in content[-rank:]:
     score.append(i['score'])
     seed_question.append(i['query'])
