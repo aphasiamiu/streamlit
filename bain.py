@@ -17,6 +17,8 @@ TEXT_WRAPPER = """<font color={}>{}</font> """
 text_color = ['#C33C54', '#254E70', '#F26419', '#F6AE2D',
               '#86BBD8', '#2F4858', '#B84A62', '#A997DF', '#F7996E', '#4C9F70']
 
+HTML_SOURCE = """<div style = "font-size: 12px; color: #979797; margin-bottom: 2rem; margin-left: 5rem">{}</div> """
+
 
 # original embedded function
 def embeded(seed_question):
@@ -57,7 +59,10 @@ def embedded(seed_question):
             feedback += "<b>\"" + query + "\"</b><br>"
         # st.write(TEXT_WRAPPER.format(color,feedback), unsafe_allow_html=True)
         num = str(total_num[embed_list.index(i)])
-        final_result += TEXT_WRAPPER.format(color, "( total number: " + num + " ) <br>" + feedback) + "<br>"
+        percentage = int(num) / sum(total_num)
+        percentage = "{0:.2%}".format(percentage)
+        final_result += TEXT_WRAPPER.format(color,
+                                            " Total Sample: " + num + "&nbsp&nbsp   <b>(" + percentage + ")</b> <br>" + feedback) + "<br>"
     st.write(HTML_WRAPPER.format(final_result), unsafe_allow_html=True)
 
 
@@ -102,6 +107,7 @@ def target(query):
 
         for factor in factors:
             target_list[factor][i] /= target_list['total'][i]
+    sum(target_list['total'])
 
     x = [brands[i] + str(target_list['total'][i]) for i in range(len(brands))]
     fig = go.Figure(go.Bar(x=x, y=target_list[factors[0]], name=factors[0], marker_color='#57A773'))
@@ -109,6 +115,8 @@ def target(query):
         fig.add_trace(go.Bar(x=x, y=target_list[i], name=i, marker_color=text_color[factors.index(i)]))
     fig.update_layout(barmode='stack')
     st.plotly_chart(fig)
+    source = "Source: Consumer survey(N=" + str(sum(target_list['total'])) + ")     Result shown in percentage"
+    st.write(HTML_SOURCE.format(source), unsafe_allow_html=True)
 
 
 def comment_by_keyword(keyword, queries):
@@ -126,6 +134,7 @@ def barchart(index):
     pos = []
     neu = []
     total_list = []
+    sample_num = 0
 
     for brand in brands:
         num = content[index]['brands'][brand]['keyword_clusters']['num_of_sample'][brand]
@@ -133,10 +142,11 @@ def barchart(index):
         neg.append(num['NEG'] / total)
         neu.append(num['NEU'] / total)
         pos.append(num['POS'] / total)
-        # neg.append("{:.2%}".format(num['NEG'] / total))
-        # neu.append("{:.2%}".format(num['NEU'] / total))
-        # pos.append("{:.2%}".format(num['POS'] / total))
+        # neg.append("{0:.2%}".format(num['NEG'] / total))
+        # neu.append("{0:.2%}".format(num['NEU'] / total))
+        # pos.append("{0:.2%}".format(num['POS'] / total))
         total_list.append(total)
+        sample_num += total
 
     x = [brands[i] + str(total_list[i]) for i in range(len(brands))]
     fig = go.Figure(go.Bar(x=x, y=pos, name='Positive', marker_color='#57A773'))
@@ -144,6 +154,8 @@ def barchart(index):
     fig.add_trace(go.Bar(x=x, y=neg, name='Negative', marker_color='#EE6352'))
     fig.update_layout(barmode='stack')
     st.plotly_chart(fig)
+    source = 'Source: Consumer survey(N=' + str(sample_num) + ")     Result shown in percentage"
+    st.write(HTML_SOURCE.format(source), unsafe_allow_html=True)
 
 
 def donut(brand, index):
@@ -210,7 +222,8 @@ content = sorted(file, key=lambda i: i['score'])
 brands = ['万岁', '大禾', '禾绿', '池田', '摩打食堂', '新一番', '元气', '争鲜', '丸米', '滨寿司', '伊秀寿司']
 score = []
 seed_question = []
-for i in content[:5]:
+rank = 10
+for i in content[-rank:]:
     score.append(i['score'])
     seed_question.append(i['query'])
 
