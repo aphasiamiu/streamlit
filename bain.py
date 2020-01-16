@@ -44,18 +44,21 @@ def embedded(seed_question):
     queries = queries['brands'][embed_brand]['embed_clusters']
 
     embed_list = []
+    total_num = []
     final_result = ""
     for query in queries:
         embed_list.append(query['examples'])
+        total_num.append(query['size'])
+
     for i in embed_list:
         color = text_color[embed_list.index(i)]
         feedback = ""
         for query in i:
             feedback += "<b>\"" + query + "\"</b><br>"
         # st.write(TEXT_WRAPPER.format(color,feedback), unsafe_allow_html=True)
-        final_result += TEXT_WRAPPER.format(color, feedback) + "<br>"
+        num = str(total_num[embed_list.index(i)])
+        final_result += TEXT_WRAPPER.format(color, "( total number: " + num + " ) <br>" + feedback) + "<br>"
     st.write(HTML_WRAPPER.format(final_result), unsafe_allow_html=True)
-
 
 
 def comments(seed_question):
@@ -90,9 +93,17 @@ def target(query):
             target_list[factor].append(mysize['size'])
 
     # get the percentage
+    target_list['total'] = []
+    for i in range(len(brands)):
+        total = 0
+        for factor in factors:
+            total += target_list[factor][i]
+        target_list['total'].append(total)
 
+        for factor in factors:
+            target_list[factor][i] /= target_list['total'][i]
 
-    x = brands
+    x = [brands[i] + str(target_list['total'][i]) for i in range(len(brands))]
     fig = go.Figure(go.Bar(x=x, y=target_list[factors[0]], name=factors[0], marker_color='#57A773'))
     for i in factors[1:]:
         fig.add_trace(go.Bar(x=x, y=target_list[i], name=i, marker_color=text_color[factors.index(i)]))
@@ -122,6 +133,9 @@ def barchart(index):
         neg.append(num['NEG'] / total)
         neu.append(num['NEU'] / total)
         pos.append(num['POS'] / total)
+        # neg.append("{:.2%}".format(num['NEG'] / total))
+        # neu.append("{:.2%}".format(num['NEU'] / total))
+        # pos.append("{:.2%}".format(num['POS'] / total))
         total_list.append(total)
 
     x = [brands[i] + str(total_list[i]) for i in range(len(brands))]
