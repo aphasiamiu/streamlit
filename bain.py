@@ -19,6 +19,7 @@ text_color = ['#C33C54', '#254E70', '#F26419', '#F6AE2D',
 
 HTML_SOURCE = """<div style = "font-size: 12px; color: #D8D8D8; margin-bottom: 2rem; margin-left: 1rem">{}</div> """
 
+
 # original embedded function
 def embeded(seed_question):
     queries = next(item for item in file if item["query"] == seed_question)
@@ -115,10 +116,31 @@ def target(query):
     fig = go.Figure(go.Bar(x=x, y=target_list[factors[0]], name=factors[0], marker_color='#57A773'))
     for i in factors[1:]:
         fig.add_trace(go.Bar(x=x, y=target_list[i], name=i, marker_color=text_color[factors.index(i)]))
-    fig.update_layout(barmode='stack',margin=dict(l=0, r=0, t=20, b=10))
+    fig.update_layout(barmode='stack', margin=dict(l=0, r=0, t=20, b=10))
     st.plotly_chart(fig, config={'displayModeBar': False}, width=800, height=350)
     source = "Source: Consumer survey(N=" + str(sum(target_list['total'])) + ")     Result shown in percentage"
     st.write(HTML_SOURCE.format(source), unsafe_allow_html=True)
+
+    # show example results
+    is_target_sample = st.checkbox("Show Sample Target Examples")
+    if is_target_sample:
+        target_brand = st.selectbox("    ",brands)
+        target_factor = []
+        example_list = {}
+        target_example = queries['brands'][target_brand]['target_clusters']
+        for factor in factors:
+
+            target_examples = next(item for item in target_example if item["name"] == factor)
+            example_list[factor]=target_examples['examples']
+            target_factor.append(factor+" ("+str(target_examples['size'])+")")
+
+        selected_target_factor = st.selectbox("       ",target_factor).split(" ")[0]
+        target_examples = next(item for item in target_example if item["name"] == selected_target_factor)
+        comment = " "
+        for i in target_examples['examples']:
+            comment+= "<b>\"" + i + "\"<br>"
+        st.write(HTML_WRAPPER.format(comment), unsafe_allow_html=True)
+
 
 
 def comment_by_keyword(keyword, queries):
@@ -166,14 +188,14 @@ def sentiment(index):
     if sentiment_example:
         senti_brand = st.selectbox('', brands)
         sentiment_list = []
-        for i in ['NEGATIVE','POSITIVE','NEUTRAL']:
-            sentiment_list.append(i+ " ("+str(content[index]['brands'][senti_brand]['keyword_clusters']['num_of_sample'][senti_brand][i[:3]])+")")
-        chosen = st.selectbox('',sentiment_list)
+        for i in ['NEGATIVE', 'POSITIVE', 'NEUTRAL']:
+            sentiment_list.append(i + " (" + str(
+                content[index]['brands'][senti_brand]['keyword_clusters']['num_of_sample'][senti_brand][i[:3]]) + ")")
+        chosen = st.selectbox('', sentiment_list)
         chosen = chosen[:3]
 
         result = content[index]['brands'][senti_brand]['keyword_clusters']['sentiments'][senti_brand]['sample'][chosen]
         st.write(result)
-
 
 
 def donut(brand, index):
@@ -193,8 +215,8 @@ def criteria():
         y=seed_question,
         marker_color='#918EF4',
         orientation='h'))
-    fig.update_layout(margin=dict(l=0, r=0, t=20, b=10),xaxis = dict(range=[0.75,0.88]))
-    st.plotly_chart(fig, config={'displayModeBar': False},width=700, height=100 + 35 * rank)
+    fig.update_layout(margin=dict(l=0, r=0, t=20, b=10), xaxis=dict(range=[0.75, 0.88]))
+    st.plotly_chart(fig, config={'displayModeBar': False}, width=700, height=100 + 35 * rank)
     st.write(' ')
     st.write(' ')
     st.write(' ')
