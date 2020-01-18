@@ -124,23 +124,21 @@ def target(query):
     # show example results
     is_target_sample = st.checkbox("Show Sample Target Examples")
     if is_target_sample:
-        target_brand = st.selectbox("    ",brands)
+        target_brand = st.selectbox("    ", brands)
         target_factor = []
         example_list = {}
         target_example = queries['brands'][target_brand]['target_clusters']
         for factor in factors:
-
             target_examples = next(item for item in target_example if item["name"] == factor)
-            example_list[factor]=target_examples['examples']
-            target_factor.append(factor+" ("+str(target_examples['size'])+")")
+            example_list[factor] = target_examples['examples']
+            target_factor.append(factor + " (" + str(target_examples['size']) + ")")
 
-        selected_target_factor = st.selectbox("       ",target_factor).split(" ")[0]
+        selected_target_factor = st.selectbox("       ", target_factor).split(" ")[0]
         target_examples = next(item for item in target_example if item["name"] == selected_target_factor)
         comment = " "
         for i in target_examples['examples']:
-            comment+= "<b>\"" + i + "\"<br>"
+            comment += "<b>\"" + i + "\"<br>"
         st.write(HTML_WRAPPER.format(comment), unsafe_allow_html=True)
-
 
 
 def comment_by_keyword(keyword, queries):
@@ -279,7 +277,7 @@ score = []
 seed_question = []
 
 st.header('Key Purchase Criteria')
-rank = st.number_input('insert a number', min_value=3, value=5)
+rank = st.number_input('insert a number', min_value=3, max_value=12, value=5)
 for i in content[-rank:]:
     score.append(i['score'])
     seed_question.append(i['query'])
