@@ -183,19 +183,19 @@ def sentiment(index):
     source = 'Source: Consumer survey(N=' + str(sample_num) + ")     Result shown in percentage"
     st.write(HTML_SOURCE.format(source), unsafe_allow_html=True)
 
-    # show example results
-    sentiment_example = st.checkbox('Show Example Results')
-    if sentiment_example:
-        senti_brand = st.selectbox('', brands)
-        sentiment_list = []
-        for i in ['NEGATIVE', 'POSITIVE', 'NEUTRAL']:
-            sentiment_list.append(i + " (" + str(
-                content[index]['brands'][senti_brand]['keyword_clusters']['num_of_sample'][senti_brand][i[:3]]) + ")")
-        chosen = st.selectbox('', sentiment_list)
-        chosen = chosen[:3]
-
-        result = content[index]['brands'][senti_brand]['keyword_clusters']['sentiments'][senti_brand]['sample'][chosen]
-        st.write(result)
+    # # show example results
+    # sentiment_example = st.checkbox('Show Example Results')
+    # if sentiment_example:
+    #     senti_brand = st.selectbox('', brands)
+    #     sentiment_list = []
+    #     for i in ['NEGATIVE', 'POSITIVE', 'NEUTRAL']:
+    #         sentiment_list.append(i + " (" + str(
+    #             content[index]['brands'][senti_brand]['keyword_clusters']['num_of_sample'][senti_brand][i[:3]]) + ")")
+    #     chosen = st.selectbox('', sentiment_list)
+    #     chosen = chosen[:3]
+    #
+    #     result = content[index]['brands'][senti_brand]['keyword_clusters']['sentiments'][senti_brand]['sample'][chosen]
+    #     st.write(result)
 
 
 def donut(brand, index):
@@ -215,7 +215,7 @@ def criteria():
         y=seed_question,
         marker_color='#918EF4',
         orientation='h'))
-    fig.update_layout(margin=dict(l=0, r=0, t=20, b=10), xaxis=dict(range=[0.75, 0.88]))
+    fig.update_layout(margin=dict(l=0, r=0, t=20, b=10), xaxis=dict(range=[0.7, 0.8]))
     st.plotly_chart(fig, config={'displayModeBar': False}, width=700, height=100 + 35 * rank)
     st.write(' ')
     st.write(' ')
@@ -264,8 +264,17 @@ st.title('Sushi Restaurant Report')
 
 # purchase criteria
 file = json.load(open('bain_final_new.json'))
-content = sorted(file, key=lambda i: i['score'])
+
+# content = sorted(file, key=lambda i: i['score'])
+content = file
 brands = ['万岁', '大禾', '禾绿', '池田', '摩打食堂', '新一番', '元气', '争鲜', '丸米', '滨寿司', '伊秀寿司']
+for c in content:
+    total_score = 0
+    for b in brands:
+        total_score += c["brands"][b]["score"]
+    c["score"] = float(total_score / 11)
+content = sorted(content, key=lambda i: i['score'])
+# brands = ['万岁', '大禾', '禾绿', '池田', '摩打食堂', '新一番', '元气', '争鲜', '丸米', '滨寿司', '伊秀寿司']
 score = []
 seed_question = []
 
